@@ -32,6 +32,19 @@ Vi kan slå opp i JNDI som vist under:
     InitialContext ctx=new InitialContext();
     ctx.lookup(<jndi_navn>);
 
+hent ``QueueConnectionFactory``
+
+    QueueConnectionFactory connectionFactory = (QueueConnectionFactory) context.lookup("jms/QueueConnectionFactory");
+
+hent ``Queue``
+
+    Destination destination = (Destination) context.lookup("jms/Queue");
+
+eller
+
+    Queue destination = (Queue) context.lookup("jms/Queue");
+
+
 Her <jndi_navn> skal være samme som vi har opprettet i Glassfish admin console. For å hente destinasjon, må vi gjøre det samme. Disse to er såkalte ``Administered objects``, som må konfigureres på forhånd, ref forrige forelesning.
 
 

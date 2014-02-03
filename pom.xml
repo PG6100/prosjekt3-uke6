@@ -14,9 +14,10 @@
     <dependencies>
         <dependency>
             <groupId>javax.jms</groupId>
-            <artifactId>jms-api</artifactId>
-            <version>1.1-rev-1</version>
+            <artifactId>javax.jms-api</artifactId>
+            <version>2.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.glassfish.main.appclient</groupId>
             <artifactId>gf-client</artifactId>

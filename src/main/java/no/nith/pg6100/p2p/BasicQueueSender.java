@@ -6,14 +6,24 @@ import javax.naming.InitialContext;
 public class BasicQueueSender {
     public static void main( String[] args )    {
         try {
-            System.out.println("Initializing queue sender...");
             InitialContext context = new InitialContext();
             QueueConnectionFactory connectionFactory = (QueueConnectionFactory) context.lookup("jms/QueueConnectionFactory");
             System.out.println("got queue connection factory: " + connectionFactory.getClass().getName());
-            //TODO kode for å sende til queue "jms/Queue"
-            // jndi oppslag for å hente destinasjon
-            // opprett connection, opprett session
-            // lag en melding, f.eks text melding, og send til queue
+            QueueConnection con = connectionFactory.createQueueConnection();
+            try {
+                Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                try {
+                    Destination destination = (Destination) context.lookup("jms/Queue");
+                    MessageProducer producer = session.createProducer(destination);
+                    TextMessage textMessage = session.createTextMessage();
+                    textMessage.setText("Heia fisk frosk, melding fra basic queue sender!");
+                    producer.send(textMessage);
+                } finally {
+                    session.close();
+                }
+            } finally {
+                con.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

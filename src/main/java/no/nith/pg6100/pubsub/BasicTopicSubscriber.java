@@ -1,11 +1,12 @@
 package no.nith.pg6100.pubsub;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.Message;
+import no.nith.pg6100.ShutdownHook;
+
+import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class BasicTopicSubscriber {
+public class BasicTopicSubscriber implements MessageListener {
 
     public static void main(String[] args) {
         try {
@@ -15,20 +16,34 @@ public class BasicTopicSubscriber {
         }
     }
 
-    private void start() throws NamingException {
+    private void start() throws NamingException, JMSException {
         System.out.println("creating a topic subscriber ....");
         InitialContext context = new InitialContext();
-        ConnectionFactory conFactory = (ConnectionFactory) context.lookup("jms/TopicConnectionFactory");
-
-        //TODO
-        // her må dere gjøre akkurat det samme som med queue med unntak av at dette blir asynkron
-        // husk å starte connection
-        // denne klassen må ikke avslutte seg selv, og vente til meldingene kommer,
-        // man kan gjøre løkke while(true) {Thread.sleep(1000);} for at tråden skal blokere
+        TopicConnectionFactory conFactory = (TopicConnectionFactory) context.lookup("jms/TopicConnectionFactory");
+        TopicConnection con = conFactory.createTopicConnection(); // alt. conFactory.createConnection()
+        ShutdownHook.add(con);
+        try {
+            TopicSession session = con.createTopicSession(false, Session.AUTO_ACKNOWLEDGE); // alt. con.createSession()
+            Topic topic = (Topic) context.lookup("jms/Topic");
+            TopicSubscriber consumer = session.createSubscriber(topic); // kan også bruke session.createConsumer()
+            consumer.setMessageListener(this);
+            System.out.println("listening to incoming topic messages...");
+            con.start();
+            for (; ; ) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
 
     public void onMessage(final Message message) {
-
+        System.out.println("Message received on jms/Topic, printing it!");
+        System.out.println(message);
     }
 }

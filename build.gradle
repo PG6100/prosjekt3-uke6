@@ -1,7 +1,8 @@
 apply plugin: 'java'
 apply plugin:'application'
-mainClassName = "no.nith.pg6100.Main"
 
+mainClassName = System.getProperty("mainClassName") ?: "no.nith.pg6100.Main"
+//gradle run -DmainClassName="no.nith.pg6100.p2p.BasicQueueReceiver"
 project.buildDir = 'target'
 version = '0.1'
 
